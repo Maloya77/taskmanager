@@ -5,8 +5,10 @@
 package com.sibusiso.taskmanager.taskmanager.controller;
 
 import com.sibusiso.taskmanager.taskmanager.model.Task;
+import com.sibusiso.taskmanager.taskmanager.model.User;
 import com.sibusiso.taskmanager.taskmanager.repository.TaskRepository;
 import com.sibusiso.taskmanager.taskmanager.service.TaskService;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ public ResponseEntity<Task> getTaskById(@PathVariable("id") Long id) {  // Expli
 
     // Get tasks by status
     @GetMapping("/status/{status}")
-    public List<Task> getTasksByStatus(@PathVariable String status) {
+    public List<Task> getTasksByStatus(@PathVariable("status") String status) {
         return taskService.getTasksByStatus(status);
     }
 
@@ -77,4 +79,31 @@ public Task updateTask(@PathVariable("id") Long id, @RequestBody Task taskDetail
 public void deleteTask(@PathVariable("id") Long id) {
     taskService.deleteTask(id);
 }
+// Filter tasks by priority
+    @GetMapping("/priority/{priority}")
+    public List<Task> getTasksByPriority(@PathVariable("priority") Integer priority) {
+        return taskService.getTasksByPriority(priority);
+    }
+
+    // Filter tasks within a due date range
+    @GetMapping("/filter/due-date")
+    public List<Task> getTasksByDueDateRange(
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
+        return taskService.getTasksWithinDueDateRange(startDate, endDate);
+    }
+
+     @GetMapping("/assigned-to/{userId}")
+    public ResponseEntity<List<Task>> getTasksAssignedTo(@PathVariable Long userId) {
+        User user = new User();
+        user.setId(userId);
+        return ResponseEntity.ok(taskService.getTasksAssignedTo(user));
+    }
+
+    @GetMapping("/assigned-by/{userId}")
+    public ResponseEntity<List<Task>> getTasksAssignedBy(@PathVariable Long userId) {
+        User user = new User();
+        user.setId(userId);
+        return ResponseEntity.ok(taskService.getTasksAssignedBy(user));
+    }
 }

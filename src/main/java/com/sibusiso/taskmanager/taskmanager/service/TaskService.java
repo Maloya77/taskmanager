@@ -5,7 +5,9 @@
 package com.sibusiso.taskmanager.taskmanager.service;
 
 import com.sibusiso.taskmanager.taskmanager.model.Task;
+import com.sibusiso.taskmanager.taskmanager.model.User;
 import com.sibusiso.taskmanager.taskmanager.repository.TaskRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,5 +67,21 @@ public class TaskService {
     // Delete a task
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
+    }
+    
+    public List<Task> getTasksByPriority(Integer priority) {
+        return taskRepository.findByPriority(priority);
+    }
+
+    public List<Task> getTasksWithinDueDateRange(LocalDate startDate, LocalDate endDate) {
+        return taskRepository.findTasksWithinDueDateRange(startDate, endDate);
+    }
+
+   public List<Task> getTasksAssignedTo(User user) {
+        return taskRepository.findByAssignedTo(user);
+    }
+
+    public List<Task> getTasksAssignedBy(User user) {
+        return taskRepository.findByAssignedBy(user);
     }
 }

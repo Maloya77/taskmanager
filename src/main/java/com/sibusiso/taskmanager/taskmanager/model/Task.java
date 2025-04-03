@@ -4,6 +4,7 @@
  */
 package com.sibusiso.taskmanager.taskmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -37,7 +38,7 @@ public class Task {
     private String status; // Example: "Pending", "In Progress", "Completed"
 
     @Column(nullable = false)
-    private int priority; // Example: 1 = High, 2 = Medium, 3 = Low
+    private Integer priority; // Example: 1 = High, 2 = Medium, 3 = Low
 
     @Column(nullable = false)
     private LocalDateTime dueDate; // Updated to LocalDateTime
@@ -48,7 +49,15 @@ public class Task {
     @Column(nullable = false)
     private LocalDateTime updatedAt; // Timestamp for last update
 
-    private String assignedTo; // Assigned user (Later, we can link to a User entity)
+     @ManyToOne
+    @JoinColumn(name = "assigned_to_id")
+    @JsonBackReference // To break the cycle on the Task side
+    private User assignedTo;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_by_id")
+    @JsonBackReference 
+    private User assignedBy;
 
     private String attachments; // File URL/path
 
@@ -130,11 +139,11 @@ public class Task {
         this.updatedAt = updatedAt;
     }
 
-    public String getAssignedTo() {
+    public User getAssignedTo() {
         return assignedTo;
     }
 
-    public void setAssignedTo(String assignedTo) {
+    public void setAssignedTo(User assignedTo) {
         this.assignedTo = assignedTo;
     }
 
