@@ -5,6 +5,7 @@
 package com.sibusiso.taskmanager.taskmanager.service;
 
 import com.sibusiso.taskmanager.taskmanager.model.Task;
+import com.sibusiso.taskmanager.taskmanager.model.TaskStatus;
 import com.sibusiso.taskmanager.taskmanager.model.User;
 import com.sibusiso.taskmanager.taskmanager.repository.TaskRepository;
 import java.time.LocalDate;
@@ -40,9 +41,11 @@ public class TaskService {
         return taskOptional.orElse(null); // Return task if found, else return null
     }
     // Get tasks by status
-    public List<Task> getTasksByStatus(String status) {
-        return taskRepository.findByStatus(status);
-    }
+   public List<Task> getTasksByStatus(String statusString) {
+    TaskStatus status = TaskStatus.valueOf(statusString.toUpperCase()); 
+    return taskRepository.findByStatus(status);
+}
+
 
     // Create a new task
     public Task createTask(Task task) {

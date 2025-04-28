@@ -2,5 +2,6 @@ com\sibusiso\taskmanager\taskmanager\model\User.class
 com\sibusiso\taskmanager\taskmanager\TaskManagerApplication.class
 com\sibusiso\taskmanager\taskmanager\controller\TaskController.class
 com\sibusiso\taskmanager\taskmanager\service\TaskService.class
+com\sibusiso\taskmanager\taskmanager\model\TaskStatus.class
 com\sibusiso\taskmanager\taskmanager\model\Task.class
 com\sibusiso\taskmanager\taskmanager\repository\TaskRepository.class

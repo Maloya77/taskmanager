@@ -34,8 +34,9 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private String status; // Example: "Pending", "In Progress", "Completed"
+   @Enumerated(EnumType.STRING)
+@Column(nullable = false)
+private TaskStatus status;
 
     @Column(nullable = false)
     private Integer priority; // Example: 1 = High, 2 = Medium, 3 = Low
@@ -51,12 +52,12 @@ public class Task {
 
      @ManyToOne
     @JoinColumn(name = "assigned_to_id")
-    @JsonBackReference // To break the cycle on the Task side
+    @JsonBackReference(value = "assignedTo-task") // To break the cycle on the Task side
     private User assignedTo;
 
     @ManyToOne
     @JoinColumn(name = "assigned_by_id")
-    @JsonBackReference 
+    @JsonBackReference (value = "createdBy-task")
     private User assignedBy;
 
     private String attachments; // File URL/path
@@ -99,19 +100,21 @@ public class Task {
         this.description = description;
     }
 
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 
-    public int getPriority() {
+  
+
+    public Integer getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(Integer priority) {
         this.priority = priority;
     }
 

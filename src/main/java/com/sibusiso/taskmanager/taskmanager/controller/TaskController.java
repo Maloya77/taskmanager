@@ -60,7 +60,7 @@ public ResponseEntity<Task> getTaskById(@PathVariable("id") Long id) {  // Expli
     }
 
     // Create a task
- @PostMapping  //  Handles POST requests at /tasks
+ @PostMapping("/create")  //  Handles POST requests at /tasks
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         Task savedTask = taskRepository.save(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);

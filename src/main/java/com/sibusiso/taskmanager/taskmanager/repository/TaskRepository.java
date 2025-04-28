@@ -5,6 +5,7 @@
 package com.sibusiso.taskmanager.taskmanager.repository;
 
 import com.sibusiso.taskmanager.taskmanager.model.Task;
+import com.sibusiso.taskmanager.taskmanager.model.TaskStatus;
 import com.sibusiso.taskmanager.taskmanager.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -22,7 +23,7 @@ import java.time.LocalDate;
 public interface TaskRepository extends JpaRepository<Task, Long>{
     
         // Find tasks by Status
-        List<Task> findByStatus(String status); // Example: Find tasks by status
+        List<Task> findByStatus(TaskStatus status); // Example: Find tasks by status
 
         // Find tasks by priority
     List<Task> findByPriority(Integer priority);
