@@ -1,3 +1,5 @@
+com\sibusiso\taskmanager\taskmanager\exception\ResourceNotFoundException.class
+com\sibusiso\taskmanager\taskmanager\model\Priority.class
 com\sibusiso\taskmanager\taskmanager\model\User.class
 com\sibusiso\taskmanager\taskmanager\repository\UserRepository.class
 com\sibusiso\taskmanager\taskmanager\TaskManagerApplication.class

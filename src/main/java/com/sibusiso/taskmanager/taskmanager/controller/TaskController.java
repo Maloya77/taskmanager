@@ -5,12 +5,15 @@
 package com.sibusiso.taskmanager.taskmanager.controller;
 
 import com.sibusiso.taskmanager.taskmanager.exception.UsernameNotFoundException;
+import com.sibusiso.taskmanager.taskmanager.model.Priority;
 import com.sibusiso.taskmanager.taskmanager.model.Task;
 import com.sibusiso.taskmanager.taskmanager.model.User;
 import com.sibusiso.taskmanager.taskmanager.repository.TaskRepository;
 import com.sibusiso.taskmanager.taskmanager.repository.UserRepository;
 import com.sibusiso.taskmanager.taskmanager.service.TaskService;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,10 +73,18 @@ public class TaskController {
     }
 
     // Update a task
-    @PutMapping("/{id}")
-    public Task updateTask(@PathVariable("id") Long id, @RequestBody Task taskDetails) {
-        return taskService.updateTask(id, taskDetails);
+   @PutMapping("/{id}")
+public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody Task taskDetails) {
+    try {
+        Task updatedTask = taskService.updateTask(id, taskDetails);
+        return ResponseEntity.ok(updatedTask);
+    } catch (IllegalStateException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+}
+
 
     // Delete a task
     @DeleteMapping("/{id}")
@@ -83,18 +94,18 @@ public class TaskController {
 // Filter tasks by priority
 
     @GetMapping("/priority/{priority}")
-    public List<Task> getTasksByPriority(@PathVariable("priority") Integer priority) {
+    public List<Task> getTasksByPriority(@PathVariable("priority") Priority priority) {
         return taskService.getTasksByPriority(priority);
     }
 
     // Filter tasks within a due date range
-    @GetMapping("/filter/due-date")
-    public List<Task> getTasksByDueDateRange(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-@RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
-{
-        return taskService.getTasksWithinDueDateRange(startDate, endDate);
-    }
+    @GetMapping("/due-date")
+public List<Task> getTasksByDueDate(
+        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+    return taskService.getTasksDueOnDate(startOfDay, endOfDay);
+}
 
    // Example: /api/tasks/assigned-to?username=john
     @GetMapping("/assigned-to")

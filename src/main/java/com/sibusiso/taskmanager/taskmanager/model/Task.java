@@ -9,12 +9,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
 
-
 /**
  *
  * @author ramph
  */
-
 @Entity
 @Table(name = "tasks") // Table name in MySQL
 @Getter
@@ -23,8 +21,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Task {
-   
-     @Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -34,15 +32,23 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-   @Enumerated(EnumType.STRING)
-@Column(nullable = false)
-private TaskStatus status;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Integer priority; // Example: 1 = High, 2 = Medium, 3 = Low
+    private TaskStatus status;
+
+    public Boolean getIsLocked() {
+        return isLocked;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority")
+    private Priority priority;
 
     @Column(nullable = false)
     private LocalDateTime dueDate; // Updated to LocalDateTime
+
+    @Column(name = "is_locked", columnDefinition = "TINYINT(1)")
+    private Boolean isLocked = false;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt; // Timestamp when task was created
@@ -50,20 +56,18 @@ private TaskStatus status;
     @Column(nullable = false)
     private LocalDateTime updatedAt; // Timestamp for last update
 
-     @ManyToOne
+    @ManyToOne
     @JoinColumn(name = "assigned_to_id")
     @JsonBackReference(value = "assignedTo-task") // To break the cycle on the Task side
     private User assignedTo;
 
     @ManyToOne
     @JoinColumn(name = "assigned_by_id")
-    @JsonBackReference (value = "createdBy-task")
+    @JsonBackReference(value = "createdBy-task")
     private User assignedBy;
 
     private String attachments; // File URL/path
 
-    
-    
     // Auto-set createdAt and updatedAt timestamps before persisting/updating
     @PrePersist
     protected void onCreate() {
@@ -78,6 +82,22 @@ private TaskStatus status;
 
     public Long getId() {
         return id;
+    }
+
+    public Boolean isIsLocked() {
+        return isLocked;
+    }
+
+    public void setIsLocked(Boolean isLocked) {
+        this.isLocked = isLocked;
+    }
+
+    public User getAssignedBy() {
+        return assignedBy;
+    }
+
+    public void setAssignedBy(User assignedBy) {
+        this.assignedBy = assignedBy;
     }
 
     public void setId(Long id) {
@@ -108,13 +128,11 @@ private TaskStatus status;
         this.status = status;
     }
 
-  
-
-    public Integer getPriority() {
+    public Priority getPriority() {
         return priority;
     }
 
-    public void setPriority(Integer priority) {
+    public void setPriority(Priority priority) {
         this.priority = priority;
     }
 
@@ -158,6 +176,4 @@ private TaskStatus status;
         this.attachments = attachments;
     }
 
-    
-    
 }
