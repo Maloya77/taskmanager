@@ -22,6 +22,7 @@ import java.time.LocalDate;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>{
     
+    
         // Find tasks by Status
         List<Task> findByStatus(TaskStatus status); // Example: Find tasks by status
 

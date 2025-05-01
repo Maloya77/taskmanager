@@ -4,10 +4,12 @@
  */
 package com.sibusiso.taskmanager.taskmanager.service;
 
+import com.sibusiso.taskmanager.taskmanager.exception.UsernameNotFoundException;
 import com.sibusiso.taskmanager.taskmanager.model.Task;
 import com.sibusiso.taskmanager.taskmanager.model.TaskStatus;
 import com.sibusiso.taskmanager.taskmanager.model.User;
 import com.sibusiso.taskmanager.taskmanager.repository.TaskRepository;
+import com.sibusiso.taskmanager.taskmanager.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +24,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskService {
     
-     private final TaskRepository taskRepository;
-    
-       @Autowired
-    public TaskService(TaskRepository taskRepository) {
+        private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
    
 
@@ -80,11 +83,15 @@ public class TaskService {
         return taskRepository.findTasksWithinDueDateRange(startDate, endDate);
     }
 
-   public List<Task> getTasksAssignedTo(User user) {
+     public List<Task> getTasksAssignedTo(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         return taskRepository.findByAssignedTo(user);
     }
 
-    public List<Task> getTasksAssignedBy(User user) {
+    public List<Task> getTasksAssignedBy(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         return taskRepository.findByAssignedBy(user);
     }
 }

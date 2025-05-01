@@ -4,17 +4,21 @@
  */
 package com.sibusiso.taskmanager.taskmanager.controller;
 
+import com.sibusiso.taskmanager.taskmanager.exception.UsernameNotFoundException;
 import com.sibusiso.taskmanager.taskmanager.model.Task;
 import com.sibusiso.taskmanager.taskmanager.model.User;
 import com.sibusiso.taskmanager.taskmanager.repository.TaskRepository;
+import com.sibusiso.taskmanager.taskmanager.repository.UserRepository;
 import com.sibusiso.taskmanager.taskmanager.service.TaskService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 /**
  *
  * @author ramph
@@ -23,15 +27,17 @@ import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
-    
-     private final TaskRepository taskRepository;
 
-     // Constructor-based Dependency Injection
-    public TaskController(TaskRepository taskRepository) {
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+    private final TaskService taskService;
+
+// Constructor-based Dependency Injection
+    public TaskController(TaskRepository taskRepository, UserRepository userRepository, TaskService taskService) {
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
+        this.taskService = taskService;
     }
-     @Autowired
-    private TaskService taskService;
 
     // Get all tasks
     @GetMapping
@@ -40,18 +46,15 @@ public class TaskController {
     }
 
     // Get task by ID
-    
-@GetMapping("/{id}")
-public ResponseEntity<Task> getTaskById(@PathVariable("id") Long id) {  // Explicit name
-    Task task = taskService.findById(id);
-    if (task != null) {
-        return ResponseEntity.ok(task);
-    } else {
-        return ResponseEntity.notFound().build();
+    @GetMapping("/{id}")
+    public ResponseEntity<Task> getTaskById(@PathVariable("id") Long id) {  // Explicit name
+        Task task = taskService.findById(id);
+        if (task != null) {
+            return ResponseEntity.ok(task);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-}
-
-
 
     // Get tasks by status
     @GetMapping("/status/{status}")
@@ -60,26 +63,25 @@ public ResponseEntity<Task> getTaskById(@PathVariable("id") Long id) {  // Expli
     }
 
     // Create a task
- @PostMapping("/create")  //  Handles POST requests at /tasks
+    @PostMapping("/create")  //  Handles POST requests at /tasks
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        Task savedTask = taskRepository.save(task);
+       Task savedTask = taskService.createTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
 
-
-
     // Update a task
-   @PutMapping("/{id}")
-public Task updateTask(@PathVariable("id") Long id, @RequestBody Task taskDetails) {
-    return taskService.updateTask(id, taskDetails);
-}
+    @PutMapping("/{id}")
+    public Task updateTask(@PathVariable("id") Long id, @RequestBody Task taskDetails) {
+        return taskService.updateTask(id, taskDetails);
+    }
 
     // Delete a task
-   @DeleteMapping("/{id}")
-public void deleteTask(@PathVariable("id") Long id) {
-    taskService.deleteTask(id);
-}
+    @DeleteMapping("/{id}")
+    public void deleteTask(@PathVariable("id") Long id) {
+        taskService.deleteTask(id);
+    }
 // Filter tasks by priority
+
     @GetMapping("/priority/{priority}")
     public List<Task> getTasksByPriority(@PathVariable("priority") Integer priority) {
         return taskService.getTasksByPriority(priority);
@@ -88,22 +90,23 @@ public void deleteTask(@PathVariable("id") Long id) {
     // Filter tasks within a due date range
     @GetMapping("/filter/due-date")
     public List<Task> getTasksByDueDateRange(
-            @RequestParam("startDate") LocalDate startDate,
-            @RequestParam("endDate") LocalDate endDate) {
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+@RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
+{
         return taskService.getTasksWithinDueDateRange(startDate, endDate);
     }
 
-     @GetMapping("/assigned-to/{userId}")
-    public ResponseEntity<List<Task>> getTasksAssignedTo(@PathVariable Long userId) {
-        User user = new User();
-        user.setId(userId);
-        return ResponseEntity.ok(taskService.getTasksAssignedTo(user));
+   // Example: /api/tasks/assigned-to?username=john
+    @GetMapping("/assigned-to")
+    public ResponseEntity<List<Task>> getTasksAssignedTo(@RequestParam("username") String username) {
+        List<Task> tasks = taskService.getTasksAssignedTo(username);
+        return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/assigned-by/{userId}")
-    public ResponseEntity<List<Task>> getTasksAssignedBy(@PathVariable Long userId) {
-        User user = new User();
-        user.setId(userId);
-        return ResponseEntity.ok(taskService.getTasksAssignedBy(user));
+    // Example: /api/tasks/assigned-by?username=jane
+    @GetMapping("/assigned-by")
+    public ResponseEntity<List<Task>> getTasksAssignedBy(@RequestParam("username") String username) {
+        List<Task> tasks = taskService.getTasksAssignedBy(username);
+        return ResponseEntity.ok(tasks);
     }
 }
