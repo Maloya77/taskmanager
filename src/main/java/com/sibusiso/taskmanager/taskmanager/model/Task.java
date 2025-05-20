@@ -32,6 +32,12 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "custom_reminder_time")
+    private LocalDateTime customReminderTime;
+
+    @Column(name = "last_reminder_sent")
+    private LocalDateTime lastReminderSent;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status;
@@ -174,6 +180,22 @@ public class Task {
 
     public void setAttachments(String attachments) {
         this.attachments = attachments;
+    }
+
+    public LocalDateTime getCustomReminderTime() {
+        return customReminderTime;
+    }
+
+    public void setCustomReminderTime(LocalDateTime customReminderTime) {
+        this.customReminderTime = customReminderTime;
+    }
+
+    public LocalDateTime getLastReminderSent() {
+        return lastReminderSent;
+    }
+
+    public void setLastReminderSent(LocalDateTime lastReminderSent) {
+        this.lastReminderSent = lastReminderSent;
     }
 
 }

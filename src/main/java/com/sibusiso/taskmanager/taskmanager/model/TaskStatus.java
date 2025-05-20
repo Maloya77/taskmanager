@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum TaskStatus {
     PENDING,
     IN_PROGRESS,
+       CANCELLED,
     COMPLETED;
     
     @JsonCreator

@@ -21,6 +21,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String fullName;
     private String username;
     private String email;
 
@@ -54,6 +55,13 @@ public User getAssignedTo() {
     public void setAssignedBy(User assignedBy) {
         this.assignedBy = assignedBy;
     }
+    public String getFullName() {
+    return fullName;
+}
+
+public void setFullName(String fullName) {
+    this.fullName = fullName;
+}
     public Long getId() {
         return id;
     }
@@ -83,12 +91,16 @@ public User getAssignedTo() {
     public User() {
     }
 
-    public User(Long id, String username, String email, User assignedTo, User assignedBy) {
+   
+
+    public User(Long id, String fullName, String username, String email, User assignedTo, User assignedBy, List<Task> tasks) {
         this.id = id;
+        this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.assignedTo = assignedTo;
         this.assignedBy = assignedBy;
+        this.tasks = tasks;
     }
 
    
