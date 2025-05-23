@@ -65,5 +65,5 @@ An advanced backend system for personal and collaborative task management. Built
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/your-username/task-manager.git
+   git clone https://github.com/Maloya77/task-manager.git
    cd task-manager
