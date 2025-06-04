@@ -4,23 +4,25 @@
  */
 package com.sibusiso.taskmanager.taskmanager.controller;
 
-import com.sibusiso.taskmanager.taskmanager.exception.UsernameNotFoundException;
+import com.sibusiso.taskmanager.taskmanager.dto.TaskResponse;
 import com.sibusiso.taskmanager.taskmanager.model.Priority;
 import com.sibusiso.taskmanager.taskmanager.model.Task;
-import com.sibusiso.taskmanager.taskmanager.model.User;
 import com.sibusiso.taskmanager.taskmanager.repository.TaskRepository;
 import com.sibusiso.taskmanager.taskmanager.repository.UserRepository;
+import com.sibusiso.taskmanager.taskmanager.service.FileStorageService;
 import com.sibusiso.taskmanager.taskmanager.service.TaskService;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -34,19 +36,26 @@ public class TaskController {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskService taskService;
+   
+  
+private FileStorageService fileStorageService;
 
 // Constructor-based Dependency Injection
-    public TaskController(TaskRepository taskRepository, UserRepository userRepository, TaskService taskService) {
+    public TaskController(TaskRepository taskRepository, UserRepository userRepository, TaskService taskService, FileStorageService fileStorageService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.taskService = taskService;
+        this.fileStorageService=fileStorageService;
     }
 
     // Get all tasks
-    @GetMapping
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
-    }
+   @GetMapping
+public List<TaskResponse> getAllTasks() {
+    return taskService.getAllTasks().stream()
+        .map(TaskResponse::new)
+        .toList();
+}
+
 
     // Get task by ID
     @GetMapping("/{id}")
@@ -120,4 +129,42 @@ public List<Task> getTasksByDueDate(
         List<Task> tasks = taskService.getTasksAssignedBy(username);
         return ResponseEntity.ok(tasks);
     }
+    
+  //attachment upload  
+    @PostMapping("/{id}/attachments")
+public ResponseEntity<String> uploadAttachment(@PathVariable Long id,
+                                               @RequestParam("file") MultipartFile file) {
+    Task task = taskService.findById(id); 
+    
+String filename = fileStorageService.storeFile(id, file);
+
+    task.getAttachments().add(filename);
+    taskRepository.save(task);
+
+    return ResponseEntity.ok("File uploaded: " + filename);
+}
+
+//attachment download
+@GetMapping("/{id}/attachments/{filename}")
+public ResponseEntity<Resource> downloadAttachment(@PathVariable Long id,
+                                                   @PathVariable String filename) {
+    Resource file = fileStorageService.loadFile(id, filename);
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+            .body(file);
+}
+
+//deleting an attachment
+@DeleteMapping("/{id}/attachments/{filename}")
+public ResponseEntity<String> deleteAttachment(@PathVariable Long id,
+                                               @PathVariable String filename) throws IOException {
+    Task task = taskService.findById(id);
+    fileStorageService.deleteFile(id, filename);
+
+    task.getAttachments().remove(filename);
+    taskRepository.save(task);
+
+    return ResponseEntity.ok("File deleted: " + filename);
+}
+
 }

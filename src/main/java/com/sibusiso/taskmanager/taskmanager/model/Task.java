@@ -7,6 +7,7 @@ package com.sibusiso.taskmanager.taskmanager.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.*;
 
 /**
@@ -42,6 +43,10 @@ public class Task {
     @Column(nullable = false)
     private TaskStatus status;
 
+    @ElementCollection
+private List<String> attachments;
+
+    
     public Boolean getIsLocked() {
         return isLocked;
     }
@@ -72,7 +77,7 @@ public class Task {
     @JsonBackReference(value = "createdBy-task")
     private User assignedBy;
 
-    private String attachments; // File URL/path
+   
 
     // Auto-set createdAt and updatedAt timestamps before persisting/updating
     @PrePersist
@@ -174,13 +179,7 @@ public class Task {
         this.assignedTo = assignedTo;
     }
 
-    public String getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(String attachments) {
-        this.attachments = attachments;
-    }
+   
 
     public LocalDateTime getCustomReminderTime() {
         return customReminderTime;
@@ -196,6 +195,14 @@ public class Task {
 
     public void setLastReminderSent(LocalDateTime lastReminderSent) {
         this.lastReminderSent = lastReminderSent;
+    }
+
+    public List<String> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<String> attachments) {
+        this.attachments = attachments;
     }
 
 }
