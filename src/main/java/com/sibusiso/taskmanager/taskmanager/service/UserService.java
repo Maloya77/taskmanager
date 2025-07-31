@@ -15,7 +15,7 @@ import java.util.Optional;
  *
  * @author ramph
  */
-@Service
+@Service("userService")
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * @author ramph
  */
 @Service
-@RequiredArgsConstructor
+
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
