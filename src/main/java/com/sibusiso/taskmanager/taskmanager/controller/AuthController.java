@@ -4,59 +4,33 @@
  */
 package com.sibusiso.taskmanager.taskmanager.controller;
 
-import com.sibusiso.taskmanager.taskmanager.dto.JwtResponse;
-import com.sibusiso.taskmanager.taskmanager.dto.LoginRequest;
 import com.sibusiso.taskmanager.taskmanager.dto.RegisterRequest;
-import com.sibusiso.taskmanager.taskmanager.model.User;
-import com.sibusiso.taskmanager.taskmanager.service.JwtService;
-import com.sibusiso.taskmanager.taskmanager.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.sibusiso.taskmanager.taskmanager.service.RegistrationService;
 import org.springframework.web.bind.annotation.*;
+
 /**
  *
  * @author ramph
  */
 
 @RestController
-@RequestMapping("/api/auth")
-
+@RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserService userService;
-    private final JwtService jwtService;
+    private final RegistrationService registrationService;
 
-    
-    public AuthController(AuthenticationManager authenticationManager, UserService userService, JwtService jwtService) {
-    this.authenticationManager = authenticationManager;
-    this.userService = userService;
-    this.jwtService = jwtService;
-}
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        userService.registerUser(request);
-        return ResponseEntity.ok("User registered successfully");
+    public AuthController(RegistrationService registrationService) {
+        this.registrationService = registrationService;
     }
 
-   @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            request.getUsername(),
-            request.getPassword()
-        )
-    );
+    @PostMapping("/register")
+    public String register(@RequestBody RegisterRequest request) {
+        return registrationService.register(request);
+    }
 
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    String jwt = jwtService.generateToken(userDetails.getUsername());
-
-    return ResponseEntity.ok(new JwtResponse(jwt));
-}
-
+    @GetMapping("/verify")
+    public String verify(@RequestParam String token) {
+        return registrationService.verify(token);
+    }
 }

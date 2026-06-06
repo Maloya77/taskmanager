@@ -8,8 +8,9 @@ package com.sibusiso.taskmanager.taskmanager.model;
  *
  * @author ramph
  */
-public enum Role {
-     USER,
-    ADMIN,
-    PARENT
+public enum UserStatus {
+    PENDING,
+    ACTIVE,
+    REJECTED
 }
+

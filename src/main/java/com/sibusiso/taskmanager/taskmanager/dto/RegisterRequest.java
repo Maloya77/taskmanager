@@ -11,13 +11,14 @@ import java.util.List;
  * @author ramph
  */
 public class RegisterRequest {
+
     private String fullName;
     private String username;
     private String email;
     private String password;
-    private List<Role> roles;
+    private List<Role> roles; // optional, defaults to PARENT
 
-    // Getters and setters
+    // getters + setters
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
 
