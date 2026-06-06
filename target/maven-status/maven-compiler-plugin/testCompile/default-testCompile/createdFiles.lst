@@ -1,1 +1,4 @@
+logger\TestController.class
+com\sibusiso\taskmanager\taskmanager\service\FileStorageServiceTest.class
 com\sibusiso\taskmanager\taskmanager\AppTest.class
+com\sibusiso\taskmanager\taskmanager\service\TaskServiceTest.class

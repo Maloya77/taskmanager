@@ -4,6 +4,7 @@
  */
 package com.sibusiso.taskmanager.taskmanager.repository;
 
+import com.sibusiso.taskmanager.taskmanager.model.Priority;
 import com.sibusiso.taskmanager.taskmanager.model.Task;
 import com.sibusiso.taskmanager.taskmanager.model.TaskStatus;
 import com.sibusiso.taskmanager.taskmanager.model.User;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -22,15 +24,16 @@ import java.time.LocalDate;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>{
     
+    
         // Find tasks by Status
         List<Task> findByStatus(TaskStatus status); // Example: Find tasks by status
 
         // Find tasks by priority
-    List<Task> findByPriority(Integer priority);
+    List<Task> findByPriority(Priority priority);
 
-    // Find tasks within a due date range
-    @Query("SELECT t FROM Task t WHERE t.dueDate BETWEEN :startDate AND :endDate")
-    List<Task> findTasksWithinDueDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    // Find tasks within a due date 
+   List<Task> findByDueDateBetween(LocalDateTime start, LocalDateTime end);
+
 
     // Find tasks by assigned By
     List<Task> findByAssignedBy(User assignedBy);

@@ -1,97 +1,86 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.sibusiso.taskmanager.taskmanager.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
+import java.time.Instant;
 import java.util.List;
 
 /**
  *
  * @author ramph
  */
+
 @Entity
 @Table(name = "users")
-public class User {
-    
+public class User implements org.springframework.security.core.userdetails.UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String fullName;
+
+    @Column(unique = true)
     private String username;
+
+    @Column(unique = true)
     private String email;
 
-    @ManyToOne
-@JoinColumn(name = "assigned_to_id", nullable = false)
-private User assignedTo;
+    private String password;
 
-@ManyToOne
-@JoinColumn(name = "assigned_by_id", nullable = false)
-private User assignedBy;
+    private boolean enabled = false;   // user disabled until email verified
 
-@OneToMany(mappedBy = "assignedTo")
-    @JsonIgnore
-    private List<Task> tasks;
-    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private List<Role> roles;
 
+    // --- VERIFICATION FIELDS ---
+    private String verificationToken;
+    private Instant verificationTokenExpiry;
 
-    // Getters, and Setters
-public User getAssignedTo() {
-        return assignedTo;
+    // --- UserDetails overrides ---
+    @Override
+    public List<org.springframework.security.core.GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> (org.springframework.security.core.GrantedAuthority) role::name)
+                .toList();
     }
 
-    public void setAssignedTo(User assignedTo) {
-        this.assignedTo = assignedTo;
-    }
+    @Override
+    public boolean isAccountNonExpired() { return true; }
 
-    public User getAssignedBy() {
-        return assignedBy;
-    }
+    @Override
+    public boolean isAccountNonLocked() { return true; }
 
-    public void setAssignedBy(User assignedBy) {
-        this.assignedBy = assignedBy;
-    }
-    public Long getId() {
-        return id;
-    }
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Override
+    public boolean isEnabled() { return enabled; }
 
-    public String getUsername() {
-        return username;
-    }
+    // --- Getters and setters ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-     // Constructors
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public User() {
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public User(Long id, String username, String email, User assignedTo, User assignedBy) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.assignedTo = assignedTo;
-        this.assignedBy = assignedBy;
-    }
+    public List<Role> getRoles() { return roles; }
+    public void setRoles(List<Role> roles) { this.roles = roles; }
 
-   
-    
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public String getVerificationToken() { return verificationToken; }
+    public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
+
+    public Instant getVerificationTokenExpiry() { return verificationTokenExpiry; }
+    public void setVerificationTokenExpiry(Instant verificationTokenExpiry) { this.verificationTokenExpiry = verificationTokenExpiry; }
 }
-
